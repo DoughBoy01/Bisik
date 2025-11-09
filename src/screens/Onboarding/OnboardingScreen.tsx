@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {PermissionManager, PreferencesStore} from '../../services';
-import {InterestCategory} from '../../types';
+import {InterestCategory, PermissionType} from '../../types';
 import {COLORS, INTEREST_DISPLAY_NAMES, UI_CONSTANTS} from '../../constants';
 import {logger} from '../../utils';
 
@@ -35,6 +35,7 @@ const OnboardingScreen: React.FC = () => {
     location: false,
     notifications: false,
     backgroundLocation: false,
+    contacts: false,
   });
 
   /**
@@ -59,10 +60,22 @@ const OnboardingScreen: React.FC = () => {
 
       const results = await PermissionManager.requestEssentialPermissions();
 
+      // Also request contacts permission (optional for social features)
+      const contactsPermission = await PermissionManager.checkPermission(
+        PermissionType.CONTACTS,
+      );
+      let contactsGranted = contactsPermission.granted;
+
+      if (!contactsGranted) {
+        const contactsResult = await PermissionManager.requestContactsPermission();
+        contactsGranted = contactsResult.granted;
+      }
+
       setPermissionsGranted({
         location: results.location.granted,
         notifications: results.notifications.granted,
         backgroundLocation: results.backgroundLocation.granted,
+        contacts: contactsGranted,
       });
 
       await PreferencesStore.setPermissionsRequested(true);
@@ -250,6 +263,23 @@ const OnboardingScreen: React.FC = () => {
             </Text>
           </View>
           {permissionsGranted.backgroundLocation && (
+            <Icon name="checkmark-circle" size={24} color={COLORS.success} />
+          )}
+        </View>
+
+        <View style={styles.permissionItem}>
+          <Icon
+            name="people"
+            size={32}
+            color={permissionsGranted.contacts ? COLORS.success : COLORS.textSecondary}
+          />
+          <View style={styles.permissionInfo}>
+            <Text style={styles.permissionTitle}>Contacts (Optional)</Text>
+            <Text style={styles.permissionDescription}>
+              For social features like meeting up with nearby friends
+            </Text>
+          </View>
+          {permissionsGranted.contacts && (
             <Icon name="checkmark-circle" size={24} color={COLORS.success} />
           )}
         </View>

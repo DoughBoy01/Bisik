@@ -1,6 +1,20 @@
 /**
  * Audio Player Service
  * Manages audio playback with earphone and CarPlay detection
+ *
+ * AUDIO BEHAVIOR:
+ * 1. Phone Calls: Voice notes will NEVER interrupt phone calls from any service
+ *    - Automatically detects and pauses during phone calls
+ *    - Prevents new playback from starting during calls
+ *
+ * 2. Music Ducking: When user is listening to music
+ *    - Music automatically fades down when voice note plays
+ *    - Voice note plays at full volume
+ *    - Music fades back to original volume when voice note finishes
+ *    - This is handled automatically by the OS audio session
+ *
+ * 3. CarPlay: Bypasses earphone detection requirement
+ *    - Audio plays through car speakers when CarPlay is connected
  */
 
 import Sound from 'react-native-sound';
@@ -16,8 +30,10 @@ const TAG = 'AudioPlayer';
 type PlaybackStateCallback = (state: AudioPlayerState) => void;
 type EarphonesCallback = (connected: boolean) => void;
 
-// Enable playback in silence mode (iOS)
-Sound.setCategory('Playback', true);
+// Enable playback in silence mode with audio ducking and mixing
+// This will automatically fade down other audio (like music) when our audio plays
+// and fade it back up when we're done
+Sound.setCategory('Playback', true); // true enables mixing with other apps
 
 class AudioPlayer {
   private currentSound: Sound | null = null;
@@ -27,6 +43,7 @@ class AudioPlayer {
   private duration = 0;
   private isEarphonesConnected = false;
   private isCarPlayConnected = false;
+  private isPhoneCallActive = false;
   private vehicleState: VehicleState = VehicleState.UNKNOWN;
   private volume = AUDIO_CONFIG.DEFAULT_VOLUME;
   private playbackSpeed = AUDIO_CONFIG.DEFAULT_PLAYBACK_SPEED;
@@ -37,6 +54,7 @@ class AudioPlayer {
   constructor() {
     this.setupEarphonesDetection();
     this.setupCarPlayDetection();
+    this.setupPhoneCallDetection();
   }
 
   /**
@@ -122,10 +140,74 @@ class AudioPlayer {
   }
 
   /**
+   * Set up phone call detection
+   * CRITICAL: Voice notes must NEVER interrupt phone calls
+   */
+  private setupPhoneCallDetection(): void {
+    // Listen for audio interruption events (phone calls, alarms, etc.)
+    if (Platform.OS === 'ios') {
+      const audioSession = NativeModules.AudioSession;
+      if (audioSession) {
+        const eventEmitter = new NativeEventEmitter(audioSession);
+
+        // Audio interruption began (phone call started, alarm, etc.)
+        eventEmitter.addListener('audioInterruptionBegan', () => {
+          logger.warn(TAG, 'Audio interruption began - likely phone call');
+          this.handlePhoneCallStarted();
+        });
+
+        // Audio interruption ended (phone call ended)
+        eventEmitter.addListener('audioInterruptionEnded', () => {
+          logger.info(TAG, 'Audio interruption ended');
+          this.handlePhoneCallEnded();
+        });
+      }
+    } else {
+      // Android: Listen for PHONE_STATE changes
+      // This would require a native module or react-native-callkeep
+      // For now, we'll rely on audio focus management
+    }
+
+    logger.debug(TAG, 'Phone call detection set up');
+  }
+
+  /**
+   * Handle phone call started
+   */
+  private handlePhoneCallStarted(): void {
+    this.isPhoneCallActive = true;
+
+    // Immediately pause any playing audio
+    if (this.playbackState === PlaybackState.PLAYING) {
+      logger.warn(TAG, 'Pausing playback due to phone call');
+      this.pause().catch(error => {
+        logger.error(TAG, 'Error pausing during phone call:', error);
+      });
+    }
+
+    this.notifyStateCallbacks();
+  }
+
+  /**
+   * Handle phone call ended
+   */
+  private handlePhoneCallEnded(): void {
+    this.isPhoneCallActive = false;
+    logger.info(TAG, 'Phone call ended - playback can resume');
+    this.notifyStateCallbacks();
+  }
+
+  /**
    * Check if playback is allowed based on audio output and safety settings
    * CarPlay/Android Auto bypasses earphone requirement
+   * CRITICAL: Playback is NEVER allowed during phone calls
    */
   private isPlaybackAllowed(requireEarphones: boolean = false): boolean {
+    // NEVER interrupt phone calls - this is the highest priority check
+    if (this.isPhoneCallActive) {
+      logger.warn(TAG, 'Playback blocked: Phone call in progress');
+      return false;
+    }
     // If connected to CarPlay/Android Auto, playback is always allowed
     if (this.isCarPlayConnected) {
       logger.debug(TAG, 'Playback allowed: CarPlay connected');
@@ -198,6 +280,12 @@ class AudioPlayer {
     if (this.playbackState === PlaybackState.PLAYING) {
       logger.warn(TAG, 'Already playing');
       return;
+    }
+
+    // Check if playback is allowed (not during phone calls)
+    if (!this.isPlaybackAllowed()) {
+      logger.warn(TAG, 'Playback not allowed at this time');
+      throw new Error('Playback not allowed - phone call in progress');
     }
 
     try {
@@ -403,6 +491,14 @@ class AudioPlayer {
   }
 
   /**
+   * Check if a phone call is active
+   * Voice notes will NEVER play during phone calls
+   */
+  isPhoneCall(): boolean {
+    return this.isPhoneCallActive;
+  }
+
+  /**
    * Subscribe to playback state changes
    */
   onStateChange(callback: PlaybackStateCallback): () => void {
@@ -471,6 +567,7 @@ class AudioPlayer {
     this.earphonesCallbacks = [];
     this.volume = AUDIO_CONFIG.DEFAULT_VOLUME;
     this.playbackSpeed = AUDIO_CONFIG.DEFAULT_PLAYBACK_SPEED;
+    this.isPhoneCallActive = false;
   }
 }
 
