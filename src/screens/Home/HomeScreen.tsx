@@ -259,9 +259,23 @@ const HomeScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
 
-          {playerState.isEarphonesConnected && (
-            <Icon name="headset" size={20} color={COLORS.success} />
-          )}
+          <View style={styles.playerIndicators}>
+            {playerState.isCarPlayConnected && (
+              <View style={styles.indicator}>
+                <Icon name="car" size={20} color={COLORS.info} />
+              </View>
+            )}
+            {playerState.isEarphonesConnected && (
+              <View style={styles.indicator}>
+                <Icon name="headset" size={20} color={COLORS.success} />
+              </View>
+            )}
+            {playerState.vehicleState === 'moving' && (
+              <View style={styles.indicator}>
+                <Icon name="speedometer" size={18} color={COLORS.warning} />
+              </View>
+            )}
+          </View>
         </View>
       </View>
     );
@@ -476,6 +490,14 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  playerIndicators: {
+    flexDirection: 'row',
+    gap: 8,
+    alignItems: 'center',
+  },
+  indicator: {
+    padding: 4,
   },
 });
 

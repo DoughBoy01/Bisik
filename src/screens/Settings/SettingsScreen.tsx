@@ -322,6 +322,92 @@ const SettingsScreen: React.FC = () => {
           </View>
         </View>
 
+        {/* CarPlay & Driving Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>CarPlay & Driving</Text>
+          <Text style={styles.sectionDescription}>
+            Settings for in-car audio playback
+          </Text>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Enable CarPlay</Text>
+              <Text style={styles.settingDescription}>
+                Automatically play through car speakers when connected
+              </Text>
+            </View>
+            <Switch
+              value={preferences.carPlayPreferences.enableCarPlay}
+              onValueChange={enabled =>
+                updatePreference({
+                  carPlayPreferences: {
+                    ...preferences.carPlayPreferences,
+                    enableCarPlay: enabled,
+                  },
+                })
+              }
+              trackColor={{false: COLORS.divider, true: COLORS.primaryLight}}
+              thumbColor={
+                preferences.carPlayPreferences.enableCarPlay
+                  ? COLORS.primary
+                  : COLORS.surface
+              }
+            />
+          </View>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Auto-Play in Car</Text>
+              <Text style={styles.settingDescription}>
+                Automatically start playback when car is connected
+              </Text>
+            </View>
+            <Switch
+              value={preferences.carPlayPreferences.autoPlayInCar}
+              onValueChange={enabled =>
+                updatePreference({
+                  carPlayPreferences: {
+                    ...preferences.carPlayPreferences,
+                    autoPlayInCar: enabled,
+                  },
+                })
+              }
+              trackColor={{false: COLORS.divider, true: COLORS.primaryLight}}
+              thumbColor={
+                preferences.carPlayPreferences.autoPlayInCar
+                  ? COLORS.primary
+                  : COLORS.surface
+              }
+            />
+          </View>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Play Only When Stationary</Text>
+              <Text style={styles.settingDescription}>
+                Only play voice notes when vehicle is not moving
+              </Text>
+            </View>
+            <Switch
+              value={preferences.carPlayPreferences.playOnlyWhenStationary}
+              onValueChange={enabled =>
+                updatePreference({
+                  carPlayPreferences: {
+                    ...preferences.carPlayPreferences,
+                    playOnlyWhenStationary: enabled,
+                  },
+                })
+              }
+              trackColor={{false: COLORS.divider, true: COLORS.primaryLight}}
+              thumbColor={
+                preferences.carPlayPreferences.playOnlyWhenStationary
+                  ? COLORS.primary
+                  : COLORS.surface
+              }
+            />
+          </View>
+        </View>
+
         {/* Privacy Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Privacy</Text>

@@ -44,6 +44,14 @@ export const AUDIO_CONFIG = {
   FADE_DURATION: 500, // milliseconds
 } as const;
 
+// CarPlay Configuration
+export const CARPLAY_CONFIG = {
+  MOVING_SPEED_THRESHOLD: 5, // km/h - speed above this is considered "moving"
+  DEFAULT_MAX_SPEED: 100, // km/h - default max speed for playback while driving
+  SAFE_DRIVING_SPEED: 30, // km/h - recommended max speed for voice note playback
+  SPEED_CHECK_INTERVAL: 5000, // milliseconds - how often to check vehicle speed
+} as const;
+
 // Notification Configuration
 export const NOTIFICATION_CONFIG = {
   CHANNEL_ID: 'bisik_notifications',
@@ -69,6 +77,13 @@ export const DEFAULT_PREFERENCES = {
     notificationsEnabled: false,
     dataCollectionEnabled: false,
     shareUsageData: false,
+  },
+  carPlayPreferences: {
+    enableCarPlay: true,
+    autoPlayInCar: true,
+    playOnlyWhenStationary: false, // Allow playback while driving
+    enableWhileDriving: true, // CarPlay bypasses earphone requirement
+    maxSpeedForPlayback: CARPLAY_CONFIG.SAFE_DRIVING_SPEED,
   },
 };
 

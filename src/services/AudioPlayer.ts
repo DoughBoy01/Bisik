@@ -1,14 +1,15 @@
 /**
  * Audio Player Service
- * Manages audio playback with earphone detection
+ * Manages audio playback with earphone and CarPlay detection
  */
 
 import Sound from 'react-native-sound';
 import {NativeEventEmitter, NativeModules, Platform} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import {VoiceNote, PlaybackState, AudioPlayerState} from '../types';
+import {VoiceNote, PlaybackState, AudioPlayerState, VehicleState} from '../types';
 import {AUDIO_CONFIG} from '../constants';
 import {logger} from '../utils';
+import CarPlayService from './CarPlayService';
 
 const TAG = 'AudioPlayer';
 
@@ -25,6 +26,8 @@ class AudioPlayer {
   private currentTime = 0;
   private duration = 0;
   private isEarphonesConnected = false;
+  private isCarPlayConnected = false;
+  private vehicleState: VehicleState = VehicleState.UNKNOWN;
   private volume = AUDIO_CONFIG.DEFAULT_VOLUME;
   private playbackSpeed = AUDIO_CONFIG.DEFAULT_PLAYBACK_SPEED;
   private stateCallbacks: PlaybackStateCallback[] = [];
@@ -33,6 +36,7 @@ class AudioPlayer {
 
   constructor() {
     this.setupEarphonesDetection();
+    this.setupCarPlayDetection();
   }
 
   /**
@@ -82,6 +86,66 @@ class AudioPlayer {
     } catch (error) {
       logger.error(TAG, 'Error checking earphones connection:', error);
     }
+  }
+
+  /**
+   * Set up CarPlay/Android Auto detection
+   */
+  private setupCarPlayDetection(): void {
+    // Subscribe to CarPlay connection changes
+    CarPlayService.onConnectionChange(carPlayState => {
+      const wasConnected = this.isCarPlayConnected;
+      this.isCarPlayConnected = carPlayState.isConnected;
+      this.vehicleState = carPlayState.vehicleState;
+
+      if (wasConnected !== carPlayState.isConnected) {
+        logger.info(
+          TAG,
+          `CarPlay ${carPlayState.isConnected ? 'connected' : 'disconnected'} (${carPlayState.connectionType})`,
+        );
+        this.notifyStateCallbacks();
+      }
+    });
+
+    // Subscribe to vehicle state changes
+    CarPlayService.onVehicleStateChange(vehicleState => {
+      const previousState = this.vehicleState;
+      this.vehicleState = vehicleState;
+
+      if (previousState !== vehicleState) {
+        logger.info(TAG, `Vehicle state changed: ${previousState} -> ${vehicleState}`);
+        this.notifyStateCallbacks();
+      }
+    });
+
+    logger.debug(TAG, 'CarPlay detection set up');
+  }
+
+  /**
+   * Check if playback is allowed based on audio output and safety settings
+   * CarPlay/Android Auto bypasses earphone requirement
+   */
+  private isPlaybackAllowed(requireEarphones: boolean = false): boolean {
+    // If connected to CarPlay/Android Auto, playback is always allowed
+    if (this.isCarPlayConnected) {
+      logger.debug(TAG, 'Playback allowed: CarPlay connected');
+      return true;
+    }
+
+    // If earphones are not required, playback is allowed
+    if (!requireEarphones) {
+      logger.debug(TAG, 'Playback allowed: Earphones not required');
+      return true;
+    }
+
+    // Otherwise, check if earphones are connected
+    if (this.isEarphonesConnected) {
+      logger.debug(TAG, 'Playback allowed: Earphones connected');
+      return true;
+    }
+
+    logger.warn(TAG, 'Playback not allowed: Earphones required but not connected');
+    return false;
   }
 
   /**
@@ -312,6 +376,8 @@ class AudioPlayer {
       currentTime: this.currentTime,
       duration: this.duration,
       isEarphonesConnected: this.isEarphonesConnected,
+      isCarPlayConnected: this.isCarPlayConnected,
+      vehicleState: this.vehicleState,
     };
   }
 
@@ -320,6 +386,20 @@ class AudioPlayer {
    */
   areEarphonesConnected(): boolean {
     return this.isEarphonesConnected;
+  }
+
+  /**
+   * Check if connected to CarPlay/Android Auto
+   */
+  isCarPlay(): boolean {
+    return this.isCarPlayConnected;
+  }
+
+  /**
+   * Get current vehicle state
+   */
+  getVehicleState(): VehicleState {
+    return this.vehicleState;
   }
 
   /**

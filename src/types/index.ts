@@ -82,6 +82,7 @@ export interface UserPreferences {
   notificationFrequency: NotificationFrequency;
   playbackPreferences: PlaybackPreferences;
   privacySettings: PrivacySettings;
+  carPlayPreferences: CarPlayPreferences;
 }
 
 export enum NotificationFrequency {
@@ -128,12 +129,43 @@ export enum PlaybackState {
   ERROR = 'error',
 }
 
+// CarPlay & Vehicle Types
+export enum CarConnectionType {
+  NONE = 'none',
+  CARPLAY = 'carplay',
+  ANDROID_AUTO = 'android_auto',
+}
+
+export enum VehicleState {
+  UNKNOWN = 'unknown',
+  STATIONARY = 'stationary',
+  MOVING = 'moving',
+}
+
+export interface CarPlayState {
+  isConnected: boolean;
+  connectionType: CarConnectionType;
+  vehicleState: VehicleState;
+  speed?: number; // km/h
+  lastUpdated: Date;
+}
+
+export interface CarPlayPreferences {
+  enableCarPlay: boolean;
+  autoPlayInCar: boolean;
+  playOnlyWhenStationary: boolean;
+  enableWhileDriving: boolean;
+  maxSpeedForPlayback: number; // km/h - won't play above this speed
+}
+
 export interface AudioPlayerState {
   currentVoiceNote: VoiceNote | null;
   playbackState: PlaybackState;
   currentTime: number;
   duration: number;
   isEarphonesConnected: boolean;
+  isCarPlayConnected: boolean;
+  vehicleState: VehicleState;
 }
 
 // Navigation Types

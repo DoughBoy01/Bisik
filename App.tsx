@@ -12,6 +12,7 @@ import {
   ScheduleService,
   NotificationManager,
   AudioPlayer,
+  CarPlayService,
 } from './src/services';
 import {COLORS} from './src/constants';
 import {logger} from './src/utils';
@@ -40,6 +41,10 @@ const App: React.FC = () => {
       // Initialize LocationService
       await LocationService.initialize();
       logger.info(TAG, 'LocationService initialized');
+
+      // Initialize CarPlayService
+      await CarPlayService.initialize();
+      logger.info(TAG, 'CarPlayService initialized');
 
       // Set up geofence event listener
       LocationService.onGeofenceEvent(event => {
@@ -117,6 +122,7 @@ const App: React.FC = () => {
       logger.info(TAG, 'App unmounting, cleaning up services');
       LocationService.stop().catch(err => logger.error(TAG, 'Error stopping LocationService:', err));
       ScheduleService.stop().catch(err => logger.error(TAG, 'Error stopping ScheduleService:', err));
+      CarPlayService.stop();
     };
   }, []);
 
