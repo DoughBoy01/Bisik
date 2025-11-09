@@ -19,6 +19,7 @@ import {AudioPlayer, PreferencesStore} from '../../services';
 import {VoiceNote, PlaybackState, AudioPlayerState} from '../../types';
 import {COLORS, UI_CONSTANTS} from '../../constants';
 import {logger, formatDuration, formatDate} from '../../utils';
+import {SocialSuggestionsSection} from '../../components';
 
 const TAG = 'HomeScreen';
 
@@ -197,6 +198,13 @@ const HomeScreen: React.FC = () => {
   };
 
   /**
+   * Render list header
+   */
+  const renderListHeader = () => {
+    return <SocialSuggestionsSection />;
+  };
+
+  /**
    * Render empty state
    */
   const renderEmptyState = () => (
@@ -296,6 +304,7 @@ const HomeScreen: React.FC = () => {
         renderItem={renderVoiceNoteItem}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContent}
+        ListHeaderComponent={renderListHeader}
         ListEmptyComponent={renderEmptyState}
         refreshControl={
           <RefreshControl

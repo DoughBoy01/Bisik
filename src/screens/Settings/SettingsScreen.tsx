@@ -408,6 +408,175 @@ const SettingsScreen: React.FC = () => {
           </View>
         </View>
 
+        {/* Social & Contacts Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Social & Contacts</Text>
+          <Text style={styles.sectionDescription}>
+            Get notified when friends are nearby for meetup opportunities
+          </Text>
+
+          <View style={styles.settingRow}>
+            <View style={styles.settingInfo}>
+              <Text style={styles.settingLabel}>Enable Social Features</Text>
+              <Text style={styles.settingDescription}>
+                Receive proximity-based suggestions to meet up with contacts
+              </Text>
+            </View>
+            <Switch
+              value={preferences.socialPreferences.enableSocialFeatures}
+              onValueChange={enabled =>
+                updatePreference({
+                  socialPreferences: {
+                    ...preferences.socialPreferences,
+                    enableSocialFeatures: enabled,
+                  },
+                })
+              }
+              trackColor={{false: COLORS.divider, true: COLORS.primaryLight}}
+              thumbColor={
+                preferences.socialPreferences.enableSocialFeatures
+                  ? COLORS.primary
+                  : COLORS.surface
+              }
+            />
+          </View>
+
+          {preferences.socialPreferences.enableSocialFeatures && (
+            <>
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingLabel}>Share Location with Contacts</Text>
+                  <Text style={styles.settingDescription}>
+                    Let your Bisik contacts see when you're nearby
+                  </Text>
+                </View>
+                <Switch
+                  value={preferences.socialPreferences.shareLocationWithContacts}
+                  onValueChange={enabled =>
+                    updatePreference({
+                      socialPreferences: {
+                        ...preferences.socialPreferences,
+                        shareLocationWithContacts: enabled,
+                      },
+                    })
+                  }
+                  trackColor={{false: COLORS.divider, true: COLORS.primaryLight}}
+                  thumbColor={
+                    preferences.socialPreferences.shareLocationWithContacts
+                      ? COLORS.primary
+                      : COLORS.surface
+                  }
+                />
+              </View>
+
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingLabel}>Share Activity Status</Text>
+                  <Text style={styles.settingDescription}>
+                    Share what you're doing (gym, cafe, etc.)
+                  </Text>
+                </View>
+                <Switch
+                  value={preferences.socialPreferences.shareActivityStatus}
+                  onValueChange={enabled =>
+                    updatePreference({
+                      socialPreferences: {
+                        ...preferences.socialPreferences,
+                        shareActivityStatus: enabled,
+                      },
+                    })
+                  }
+                  trackColor={{false: COLORS.divider, true: COLORS.primaryLight}}
+                  thumbColor={
+                    preferences.socialPreferences.shareActivityStatus
+                      ? COLORS.primary
+                      : COLORS.surface
+                  }
+                />
+              </View>
+
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingLabel}>Allow Suggestions</Text>
+                  <Text style={styles.settingDescription}>
+                    Receive notifications about nearby friends
+                  </Text>
+                </View>
+                <Switch
+                  value={preferences.socialPreferences.allowSuggestions}
+                  onValueChange={enabled =>
+                    updatePreference({
+                      socialPreferences: {
+                        ...preferences.socialPreferences,
+                        allowSuggestions: enabled,
+                      },
+                    })
+                  }
+                  trackColor={{false: COLORS.divider, true: COLORS.primaryLight}}
+                  thumbColor={
+                    preferences.socialPreferences.allowSuggestions
+                      ? COLORS.primary
+                      : COLORS.surface
+                  }
+                />
+              </View>
+
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingLabel}>Suggestion Radius</Text>
+                  <Text style={styles.settingDescription}>
+                    How close before suggesting a meetup
+                  </Text>
+                </View>
+                <Text style={styles.settingValue}>
+                  {preferences.socialPreferences.suggestionRadius}m
+                </Text>
+              </View>
+
+              <View style={styles.settingRow}>
+                <View style={styles.settingInfo}>
+                  <Text style={styles.settingLabel}>Quiet Hours</Text>
+                  <Text style={styles.settingDescription}>
+                    Don't send suggestions during these times
+                  </Text>
+                </View>
+                <Switch
+                  value={preferences.socialPreferences.quietHours.enabled}
+                  onValueChange={enabled =>
+                    updatePreference({
+                      socialPreferences: {
+                        ...preferences.socialPreferences,
+                        quietHours: {
+                          ...preferences.socialPreferences.quietHours,
+                          enabled,
+                        },
+                      },
+                    })
+                  }
+                  trackColor={{false: COLORS.divider, true: COLORS.primaryLight}}
+                  thumbColor={
+                    preferences.socialPreferences.quietHours.enabled
+                      ? COLORS.primary
+                      : COLORS.surface
+                  }
+                />
+              </View>
+
+              {preferences.socialPreferences.quietHours.enabled && (
+                <View style={styles.settingRow}>
+                  <View style={styles.settingInfo}>
+                    <Text style={styles.settingLabel}>Quiet Hours Time</Text>
+                    <Text style={styles.settingDescription}>
+                      {preferences.socialPreferences.quietHours.startTime} -{' '}
+                      {preferences.socialPreferences.quietHours.endTime}
+                    </Text>
+                  </View>
+                </View>
+              )}
+            </>
+          )}
+        </View>
+
         {/* Privacy Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Privacy</Text>
