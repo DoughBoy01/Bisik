@@ -13,6 +13,8 @@ import {
   NotificationManager,
   AudioPlayer,
   CarPlayService,
+  ContactsService,
+  SocialService,
 } from './src/services';
 import {COLORS} from './src/constants';
 import {logger} from './src/utils';
@@ -45,6 +47,14 @@ const App: React.FC = () => {
       // Initialize CarPlayService
       await CarPlayService.initialize();
       logger.info(TAG, 'CarPlayService initialized');
+
+      // Initialize ContactsService
+      await ContactsService.initialize();
+      logger.info(TAG, 'ContactsService initialized');
+
+      // Initialize SocialService
+      await SocialService.initialize();
+      logger.info(TAG, 'SocialService initialized');
 
       // Set up geofence event listener
       LocationService.onGeofenceEvent(event => {
@@ -123,6 +133,7 @@ const App: React.FC = () => {
       LocationService.stop().catch(err => logger.error(TAG, 'Error stopping LocationService:', err));
       ScheduleService.stop().catch(err => logger.error(TAG, 'Error stopping ScheduleService:', err));
       CarPlayService.stop();
+      SocialService.stop();
     };
   }, []);
 

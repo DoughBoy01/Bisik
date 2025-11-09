@@ -348,6 +348,134 @@ class PreferencesStore {
   }
 
   /**
+   * Get all contacts
+   */
+  async getContacts(): Promise<any[]> {
+    try {
+      const value = await AsyncStorage.getItem(STORAGE_KEYS.CONTACTS);
+      if (value !== null) {
+        const contacts = JSON.parse(value, this.dateReviver);
+        logger.debug(TAG, `Retrieved ${contacts.length} contacts`);
+        return contacts;
+      }
+      return [];
+    } catch (error) {
+      logger.error(TAG, 'Error getting contacts:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Save contacts
+   */
+  async setContacts(contacts: any[]): Promise<void> {
+    try {
+      const value = JSON.stringify(contacts);
+      await AsyncStorage.setItem(STORAGE_KEYS.CONTACTS, value);
+      logger.info(TAG, `Saved ${contacts.length} contacts`);
+    } catch (error) {
+      logger.error(TAG, 'Error saving contacts:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get Bisik users
+   */
+  async getBisikUsers(): Promise<any[]> {
+    try {
+      const value = await AsyncStorage.getItem(STORAGE_KEYS.BISIK_USERS);
+      if (value !== null) {
+        const users = JSON.parse(value, this.dateReviver);
+        logger.debug(TAG, `Retrieved ${users.length} Bisik users`);
+        return users;
+      }
+      return [];
+    } catch (error) {
+      logger.error(TAG, 'Error getting Bisik users:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Save Bisik users
+   */
+  async setBisikUsers(users: any[]): Promise<void> {
+    try {
+      const value = JSON.stringify(users);
+      await AsyncStorage.setItem(STORAGE_KEYS.BISIK_USERS, value);
+      logger.info(TAG, `Saved ${users.length} Bisik users`);
+    } catch (error) {
+      logger.error(TAG, 'Error saving Bisik users:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get social suggestions
+   */
+  async getSocialSuggestions(): Promise<any[]> {
+    try {
+      const value = await AsyncStorage.getItem(STORAGE_KEYS.SOCIAL_SUGGESTIONS);
+      if (value !== null) {
+        const suggestions = JSON.parse(value, this.dateReviver);
+        logger.debug(TAG, `Retrieved ${suggestions.length} social suggestions`);
+        return suggestions;
+      }
+      return [];
+    } catch (error) {
+      logger.error(TAG, 'Error getting social suggestions:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Save social suggestions
+   */
+  async setSocialSuggestions(suggestions: any[]): Promise<void> {
+    try {
+      const value = JSON.stringify(suggestions);
+      await AsyncStorage.setItem(STORAGE_KEYS.SOCIAL_SUGGESTIONS, value);
+      logger.info(TAG, `Saved ${suggestions.length} social suggestions`);
+    } catch (error) {
+      logger.error(TAG, 'Error saving social suggestions:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get favorite contacts
+   */
+  async getFavoriteContacts(): Promise<string[]> {
+    try {
+      const value = await AsyncStorage.getItem(STORAGE_KEYS.FAVORITE_CONTACTS);
+      if (value !== null) {
+        const favorites = JSON.parse(value);
+        logger.debug(TAG, `Retrieved ${favorites.length} favorite contacts`);
+        return favorites;
+      }
+      return [];
+    } catch (error) {
+      logger.error(TAG, 'Error getting favorite contacts:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Save favorite contacts
+   */
+  async setFavoriteContacts(contactIds: string[]): Promise<void> {
+    try {
+      const value = JSON.stringify(contactIds);
+      await AsyncStorage.setItem(STORAGE_KEYS.FAVORITE_CONTACTS, value);
+      logger.info(TAG, `Saved ${contactIds.length} favorite contacts`);
+    } catch (error) {
+      logger.error(TAG, 'Error saving favorite contacts:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Clear all stored data
    */
   async clearAll(): Promise<void> {

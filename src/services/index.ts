@@ -9,3 +9,5 @@ export {default as AudioPlayer} from './AudioPlayer';
 export {default as NotificationManager} from './NotificationManager';
 export {default as PreferencesStore} from './PreferencesStore';
 export {default as CarPlayService} from './CarPlayService';
+export {default as ContactsService} from './ContactsService';
+export {default as SocialService} from './SocialService';

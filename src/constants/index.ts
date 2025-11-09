@@ -14,6 +14,10 @@ export const STORAGE_KEYS = {
   SCHEDULED_TRIGGERS: '@bisik:scheduled_triggers',
   ONBOARDING_COMPLETED: '@bisik:onboarding_completed',
   PERMISSIONS_REQUESTED: '@bisik:permissions_requested',
+  CONTACTS: '@bisik:contacts',
+  BISIK_USERS: '@bisik:bisik_users',
+  SOCIAL_SUGGESTIONS: '@bisik:social_suggestions',
+  FAVORITE_CONTACTS: '@bisik:favorite_contacts',
 } as const;
 
 // Geofencing Configuration
@@ -52,6 +56,17 @@ export const CARPLAY_CONFIG = {
   SPEED_CHECK_INTERVAL: 5000, // milliseconds - how often to check vehicle speed
 } as const;
 
+// Social Features Configuration
+export const SOCIAL_CONFIG = {
+  DEFAULT_SUGGESTION_RADIUS: 500, // meters - default proximity for suggestions
+  MAX_SUGGESTION_RADIUS: 5000, // meters - maximum radius
+  MIN_SUGGESTION_RADIUS: 100, // meters - minimum radius
+  SUGGESTION_CHECK_INTERVAL: 60000, // milliseconds - check every minute
+  SUGGESTION_EXPIRY_TIME: 3600000, // milliseconds - 1 hour
+  MAX_ACTIVE_SUGGESTIONS: 5, // maximum number of active suggestions at once
+  NEARBY_DISTANCE_THRESHOLD: 200, // meters - consider "nearby"
+} as const;
+
 // Notification Configuration
 export const NOTIFICATION_CONFIG = {
   CHANNEL_ID: 'bisik_notifications',
@@ -84,6 +99,19 @@ export const DEFAULT_PREFERENCES = {
     playOnlyWhenStationary: false, // Allow playback while driving
     enableWhileDriving: true, // CarPlay bypasses earphone requirement
     maxSpeedForPlayback: CARPLAY_CONFIG.SAFE_DRIVING_SPEED,
+  },
+  socialPreferences: {
+    enableSocialFeatures: false, // Opt-in for privacy
+    shareLocationWithContacts: false,
+    shareActivityStatus: false,
+    allowSuggestions: false,
+    suggestionRadius: SOCIAL_CONFIG.DEFAULT_SUGGESTION_RADIUS,
+    allowMessaging: false,
+    quietHours: {
+      enabled: false,
+      startTime: '22:00',
+      endTime: '08:00',
+    },
   },
 };
 

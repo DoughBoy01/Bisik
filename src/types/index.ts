@@ -83,6 +83,7 @@ export interface UserPreferences {
   playbackPreferences: PlaybackPreferences;
   privacySettings: PrivacySettings;
   carPlayPreferences: CarPlayPreferences;
+  socialPreferences: SocialPreferences;
 }
 
 export enum NotificationFrequency {
@@ -166,6 +167,126 @@ export interface AudioPlayerState {
   isEarphonesConnected: boolean;
   isCarPlayConnected: boolean;
   vehicleState: VehicleState;
+}
+
+// Contacts & Social Types
+export interface Contact {
+  id: string;
+  recordID?: string; // Native contact ID
+  givenName: string;
+  familyName?: string;
+  displayName: string;
+  phoneNumbers: PhoneNumber[];
+  emailAddresses: EmailAddress[];
+  thumbnailPath?: string;
+  hasBisikApp?: boolean; // Whether contact also uses Bisik
+  lastSeen?: Date;
+  isFavorite?: boolean;
+}
+
+export interface PhoneNumber {
+  label: string;
+  number: string;
+}
+
+export interface EmailAddress {
+  label: string;
+  email: string;
+}
+
+export interface BisikUser {
+  id: string;
+  contactId: string;
+  name: string;
+  phoneNumber?: string;
+  email?: string;
+  lastLocation?: UserLocation;
+  currentActivity?: UserActivity;
+  lastActive: Date;
+  preferences: {
+    shareLocation: boolean;
+    shareActivity: boolean;
+    allowSuggestions: boolean;
+  };
+}
+
+export interface UserLocation {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  timestamp: Date;
+  placeName?: string; // e.g., "Starbucks", "Gym"
+  placeType?: PlaceType;
+}
+
+export enum PlaceType {
+  HOME = 'home',
+  WORK = 'work',
+  GYM = 'gym',
+  RESTAURANT = 'restaurant',
+  CAFE = 'cafe',
+  PARK = 'park',
+  SHOPPING = 'shopping',
+  OTHER = 'other',
+}
+
+export enum UserActivity {
+  IDLE = 'idle',
+  WALKING = 'walking',
+  RUNNING = 'running',
+  CYCLING = 'cycling',
+  DRIVING = 'driving',
+  AT_GYM = 'at_gym',
+  AT_RESTAURANT = 'at_restaurant',
+  AT_CAFE = 'at_cafe',
+  SHOPPING = 'shopping',
+  WORKING = 'working',
+}
+
+export interface SocialSuggestion {
+  id: string;
+  type: SuggestionType;
+  priority: 'low' | 'medium' | 'high';
+  user: BisikUser;
+  title: string;
+  message: string;
+  context: SuggestionContext;
+  expiresAt: Date;
+  createdAt: Date;
+  actioned: boolean;
+  dismissed: boolean;
+}
+
+export enum SuggestionType {
+  NEARBY_CONTACT = 'nearby_contact',
+  SHARED_ACTIVITY = 'shared_activity',
+  MEETUP_OPPORTUNITY = 'meetup_opportunity',
+  PLACE_RECOMMENDATION = 'place_recommendation',
+  ACTIVITY_INVITE = 'activity_invite',
+}
+
+export interface SuggestionContext {
+  distance?: number; // meters from user
+  placeName?: string;
+  placeType?: PlaceType;
+  activity?: UserActivity;
+  specialOffer?: string; // e.g., "2 for 1 at Starbucks"
+  timeLimit?: string; // e.g., "for the next 2 hours"
+  sharedInterests?: InterestCategory[];
+}
+
+export interface SocialPreferences {
+  enableSocialFeatures: boolean;
+  shareLocationWithContacts: boolean;
+  shareActivityStatus: boolean;
+  allowSuggestions: boolean;
+  suggestionRadius: number; // meters - how close before suggesting
+  allowMessaging: boolean;
+  quietHours: {
+    enabled: boolean;
+    startTime: string; // HH:mm format
+    endTime: string;
+  };
 }
 
 // Navigation Types
