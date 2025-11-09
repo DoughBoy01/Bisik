@@ -15,6 +15,9 @@ import {
   CarPlayService,
   ContactsService,
   SocialService,
+  VoiceNoteManager,
+  LocationSyncService,
+  ApiClient,
 } from './src/services';
 import {COLORS} from './src/constants';
 import {logger} from './src/utils';
@@ -55,6 +58,21 @@ const App: React.FC = () => {
       // Initialize SocialService
       await SocialService.initialize();
       logger.info(TAG, 'SocialService initialized');
+
+      // Initialize VoiceNoteManager
+      await VoiceNoteManager.initialize();
+      logger.info(TAG, 'VoiceNoteManager initialized');
+
+      // Initialize LocationSyncService (only if onboarding complete)
+      const onboardingComplete = await PreferencesStore.isOnboardingCompleted();
+      if (onboardingComplete) {
+        // Get or create user ID (you'll need to implement user authentication)
+        const deviceId = await import('react-native-device-info').then(m =>
+          m.default.getUniqueId(),
+        );
+        await LocationSyncService.initialize(deviceId);
+        logger.info(TAG, 'LocationSyncService initialized');
+      }
 
       // Set up geofence event listener
       LocationService.onGeofenceEvent(event => {
@@ -134,6 +152,10 @@ const App: React.FC = () => {
       ScheduleService.stop().catch(err => logger.error(TAG, 'Error stopping ScheduleService:', err));
       CarPlayService.stop();
       SocialService.stop();
+      LocationSyncService.stop();
+      VoiceNoteManager.cleanup().catch(err =>
+        logger.error(TAG, 'Error cleaning up VoiceNoteManager:', err),
+      );
     };
   }, []);
 
