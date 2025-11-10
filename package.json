@@ -29,7 +29,7 @@
     "react-native-vector-icons": "^10.0.3",
     "@react-native-community/audio-toolkit": "^2.0.3",
     "react-native-device-info": "^10.12.0",
-    "react-native-carplay": "^2.3.1",
+    "react-native-carplay": "^2.3.0",
     "react-native-contacts": "^7.0.8",
     "axios": "^1.6.5",
     "react-native-fs": "^2.20.0"
